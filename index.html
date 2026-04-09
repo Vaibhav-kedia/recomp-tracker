@@ -168,11 +168,23 @@ select { appearance: none; }
   <div id="tab-workout" class="hidden">
     <div class="card">
       <div class="flex gap-8 wrap mb-12" id="day-types"></div>
-      <input id="w-exercise" placeholder="Exercise name" class="mb-8">
+
+      <div class="flex gap-8 mb-8">
+        <button class="btn-mode active" id="exmode-preset" onclick="setExMode('preset')">PPL Exercises</button>
+        <button class="btn-mode inactive" id="exmode-custom" onclick="setExMode('custom')">Custom</button>
+      </div>
+
+      <div id="ex-input-preset">
+        <select id="exercise-select" class="mb-8"></select>
+      </div>
+      <div id="ex-input-custom" class="hidden">
+        <input id="w-exercise-custom" placeholder="Exercise name" class="mb-8">
+      </div>
+
       <div class="grid-4 mb-8">
         <input id="w-sets" type="number" placeholder="Sets">
         <input id="w-reps" type="number" placeholder="Reps">
-        <input id="w-weight" type="number" placeholder="lbs">
+        <input id="w-weight" type="number" placeholder="kg">
         <input id="w-dur" type="number" placeholder="Min">
       </div>
       <button class="btn btn-primary" onclick="addExercise()">+ Log Exercise</button>
@@ -186,7 +198,7 @@ select { appearance: none; }
   <div id="tab-weight" class="hidden">
     <div class="card">
       <div class="flex gap-8">
-        <input id="bw-input" type="number" placeholder="Today's weight (lbs)" style="flex:1">
+        <input id="bw-input" type="number" placeholder="Today's weight (kg)" style="flex:1">
         <button class="btn" style="background:var(--accent);color:#fff;width:auto" onclick="addWeight()">Log</button>
       </div>
     </div>
@@ -268,17 +280,26 @@ async function dbDelete(store, id) {
   });
 }
 
+// # LOCAL DATE (timezone safe)
+function getToday() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+function localDateStr(date) {
+  return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+}
+
 // # APP STATE
 let meals = [];
 let workouts = [];
 let weights = [];
 let currentTab = 'meals';
 let inputMode = 'preset';
+let exMode = 'preset';
 let mealLabel = 'Breakfast';
 let dayType = 'Push';
 let viewDate = getToday();
-
-function getToday() { return new Date().toISOString().split('T')[0]; }
 
 const TARGETS = { calories: [1700, 1800], protein: [150, 160], fat: [50, 60], carbs: [150, 180] };
 
@@ -301,6 +322,85 @@ const PRESET_FOODS = [
   { name: "Potstickers (6 pcs)", cal: 280, protein: 12, fat: 10, carbs: 32 },
 ];
 
+// # PPL EXERCISE PRESETS (from your split)
+const EXERCISES = {
+  Push: {
+    Compounds: [
+      "Incline Barbell Press",
+      "Flat Dumbbell Press",
+      "Overhead Press",
+    ],
+    Isolation: [
+      "Cable Flyes (low to high)",
+      "Lateral Raise",
+      "Cable Lateral Raise",
+      "Tricep Rope Pushdown",
+      "Overhead Tricep Extension",
+      "Dips (BW or assisted)",
+    ],
+    Finisher: [
+      "Hanging Knee Raises",
+      "Cable Crunches",
+      "Treadmill",
+    ],
+  },
+  Pull: {
+    Compounds: [
+      "Barbell Row",
+      "Lat Pulldown (wide grip)",
+      "Seated Cable Row (close grip)",
+    ],
+    Isolation: [
+      "Face Pulls",
+      "Straight Arm Pulldown",
+      "Barbell Curl",
+      "Hammer Curl",
+      "Incline Dumbbell Curl",
+      "Wrist Curls",
+    ],
+    Finisher: [
+      "Plank Hold",
+      "Russian Twists",
+      "Treadmill",
+    ],
+  },
+  Legs: {
+    Compounds: [
+      "Squat (or Leg Press)",
+      "Romanian Deadlift",
+      "Walking Lunges",
+    ],
+    Isolation: [
+      "Leg Curl",
+      "Leg Extension",
+      "Calf Raise",
+      "Hip Abductor Machine",
+    ],
+    Finisher: [
+      "Hanging Leg Raises",
+      "Ab Wheel or Cable Crunch",
+      "Treadmill",
+    ],
+  },
+  Cardio: {
+    Cardio: [
+      "Treadmill",
+      "Incline Walk",
+      "Cycling",
+      "Elliptical",
+      "Stair Climber",
+      "Jump Rope",
+    ],
+  },
+  Rest: {
+    Recovery: [
+      "Stretching",
+      "Foam Rolling",
+      "Light Walk",
+    ],
+  },
+};
+
 const MEAL_LABELS = ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Shake'];
 const DAY_TYPES = ['Push', 'Pull', 'Legs', 'Cardio', 'Rest'];
 
@@ -313,16 +413,18 @@ async function init() {
   renderFoodSelect();
   renderMealLabels();
   renderDayTypes();
+  renderExerciseSelect();
   renderAll();
 }
 
-// # DATE NAV
+// # DATE NAV (timezone safe, string comparison)
 function changeDate(dir) {
-  const d = new Date(viewDate + 'T12:00:00');
+  const parts = viewDate.split('-');
+  const d = new Date(+parts[0], +parts[1] - 1, +parts[2]);
   d.setDate(d.getDate() + dir);
-  const t = new Date();
-  if (d > t) return;
-  viewDate = d.toISOString().split('T')[0];
+  const newDateStr = localDateStr(d);
+  if (newDateStr > getToday()) return;
+  viewDate = newDateStr;
   renderAll();
 }
 
@@ -338,7 +440,7 @@ function switchTab(tab) {
   renderAll();
 }
 
-// # MODE
+// # MODE TOGGLES
 function setMode(mode) {
   inputMode = mode;
   document.getElementById('mode-preset').className = 'btn-mode ' + (mode === 'preset' ? 'active' : 'inactive');
@@ -347,12 +449,34 @@ function setMode(mode) {
   document.getElementById('input-custom').classList.toggle('hidden', mode !== 'custom');
 }
 
+function setExMode(mode) {
+  exMode = mode;
+  document.getElementById('exmode-preset').className = 'btn-mode ' + (mode === 'preset' ? 'active' : 'inactive');
+  document.getElementById('exmode-custom').className = 'btn-mode ' + (mode === 'custom' ? 'active' : 'inactive');
+  document.getElementById('ex-input-preset').classList.toggle('hidden', mode !== 'preset');
+  document.getElementById('ex-input-custom').classList.toggle('hidden', mode !== 'custom');
+}
+
 // # RENDERS
 function renderFoodSelect() {
   const sel = document.getElementById('food-select');
   sel.innerHTML = PRESET_FOODS.map((f, i) =>
     `<option value="${i}">${f.name} — ${f.cal}cal / ${f.protein}p / ${f.fat}f / ${f.carbs}c</option>`
   ).join('');
+}
+
+function renderExerciseSelect() {
+  const sel = document.getElementById('exercise-select');
+  const dayExercises = EXERCISES[dayType] || {};
+  let html = '';
+  for (const [section, exList] of Object.entries(dayExercises)) {
+    html += `<optgroup label="${section}">`;
+    exList.forEach(ex => {
+      html += `<option value="${ex}">${ex}</option>`;
+    });
+    html += `</optgroup>`;
+  }
+  sel.innerHTML = html;
 }
 
 function renderMealLabels() {
@@ -369,7 +493,11 @@ function renderDayTypes() {
   ).join('');
 }
 
-function setDayType(d) { dayType = d; renderDayTypes(); }
+function setDayType(d) {
+  dayType = d;
+  renderDayTypes();
+  renderExerciseSelect();
+}
 
 function renderAll() {
   renderDateNav();
@@ -382,7 +510,8 @@ function renderAll() {
 
 function renderDateNav() {
   const isToday = viewDate === getToday();
-  const d = new Date(viewDate + 'T12:00:00');
+  const parts = viewDate.split('-');
+  const d = new Date(+parts[0], +parts[1] - 1, +parts[2]);
   const label = isToday ? 'Today' : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', weekday: 'short' });
   document.getElementById('current-date').textContent = label;
 }
@@ -443,7 +572,7 @@ function renderWorkoutLog() {
   log.innerHTML = dw.map(w => {
     let meta = '';
     if (w.sets !== '-') meta += w.sets + '×' + w.reps;
-    if (w.weight !== '-') meta += ' @ ' + w.weight + 'lbs';
+    if (w.weight !== '-') meta += ' @ ' + w.weight + 'kg';
     if (w.duration !== '-') meta += ' ' + w.duration + 'min';
     return `<div class="log-item">
       <div><div class="log-name">${w.exercise}</div><div class="log-meta mono">${meta}</div></div>
@@ -456,7 +585,6 @@ function renderWeightTab() {
   const sorted = [...weights].sort((a, b) => a.date.localeCompare(b.date));
   const recent = sorted.slice(-14);
 
-  // chart
   const chartCard = document.getElementById('weight-chart-card');
   if (recent.length > 1) {
     chartCard.style.display = 'block';
@@ -483,13 +611,12 @@ function renderWeightTab() {
     chartCard.style.display = 'none';
   }
 
-  // list
   const listCard = document.getElementById('weight-list-card');
   const list = document.getElementById('weight-list');
   if (sorted.length > 0) {
     listCard.style.display = 'block';
     list.innerHTML = sorted.slice(-7).reverse().map(w =>
-      `<div class="log-item"><span class="mono" style="color:var(--text-secondary)">${w.date}</span><span class="mono" style="font-weight:600">${w.weight} lbs</span></div>`
+      `<div class="log-item"><span class="mono" style="color:var(--text-secondary)">${w.date}</span><span class="mono" style="font-weight:600">${w.weight} kg</span></div>`
     ).join('');
   } else {
     listCard.style.display = 'none';
@@ -561,13 +688,19 @@ async function removeMeal(id) {
 }
 
 async function addExercise() {
-  const exercise = document.getElementById('w-exercise').value.trim();
-  if (!exercise) return;
+  let exerciseName;
+  if (exMode === 'preset') {
+    exerciseName = document.getElementById('exercise-select').value;
+  } else {
+    exerciseName = document.getElementById('w-exercise-custom').value.trim();
+  }
+  if (!exerciseName) return;
+
   const entry = {
     id: Date.now().toString(),
     date: getToday(),
     dayType,
-    exercise,
+    exercise: exerciseName,
     sets: document.getElementById('w-sets').value || '-',
     reps: document.getElementById('w-reps').value || '-',
     weight: document.getElementById('w-weight').value || '-',
@@ -575,7 +708,8 @@ async function addExercise() {
   };
   workouts.push(entry);
   await dbPut('workouts', entry);
-  ['w-exercise','w-sets','w-reps','w-weight','w-dur'].forEach(id => document.getElementById(id).value = '');
+  if (exMode === 'custom') document.getElementById('w-exercise-custom').value = '';
+  ['w-sets','w-reps','w-weight','w-dur'].forEach(id => document.getElementById(id).value = '');
   renderAll();
 }
 
