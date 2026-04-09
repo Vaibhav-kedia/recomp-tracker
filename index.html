@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Recomp">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Recomp Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0c;
+  --card: #131318;
+  --border: #1e1e26;
+  --text: #e8e8ec;
+  --text-secondary: #9898a6;
+  --text-muted: #5a5a6e;
+  --accent: #6366f1;
+  --accent-soft: rgba(99,102,241,0.12);
+  --btn-inactive: #1a1a22;
+  --input-bg: #0e0e12;
+  --bar-bg: #1a1a22;
+  --green: #4ecb71;
+  --yellow: #f0c24a;
+  --red: #e85d4a;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: env(safe-area-inset-top) 0 0 0;
+  overflow-x: hidden;
+}
+.mono { font-family: 'JetBrains Mono', monospace; }
+.app { max-width: 440px; margin: 0 auto; padding: 12px 14px 90px; }
+.header { text-align: center; padding: 16px 0 14px; }
+.header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+.header p { font-size: 11px; color: var(--text-muted); letter-spacing: 2px; }
+.card { background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 14px; border: 1px solid var(--border); }
+.card-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 10px; }
+.bar-wrap { margin-bottom: 10px; }
+.bar-header { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 3px; color: var(--text-secondary); }
+.bar-track { height: 6px; background: var(--bar-bg); border-radius: 3px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+input, select {
+  width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--input-bg); color: var(--text); font-size: 13px;
+  font-family: 'JetBrains Mono', monospace;
+}
+input:focus, select:focus { outline: 1px solid var(--accent); }
+input::placeholder { color: var(--text-muted); }
+select { appearance: none; }
+.btn {
+  padding: 10px 16px; border-radius: 8px; border: none; font-size: 13px;
+  font-weight: 600; cursor: pointer; font-family: 'JetBrains Mono', monospace;
+  transition: opacity 0.2s;
+}
+.btn:active { opacity: 0.7; }
+.btn-primary { background: var(--accent); color: #fff; width: 100%; }
+.btn-toggle {
+  padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border);
+  background: transparent; color: var(--text-secondary); font-size: 12px;
+  font-family: 'JetBrains Mono', monospace; cursor: pointer;
+}
+.btn-toggle.active { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+.btn-mode { flex: 1; padding: 8px 0; border-radius: 8px; border: none; cursor: pointer; font-size: 12px; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+.btn-mode.active { background: var(--accent); color: #fff; }
+.btn-mode.inactive { background: var(--btn-inactive); color: var(--text-secondary); }
+.flex { display: flex; }
+.gap-8 { gap: 8px; }
+.wrap { flex-wrap: wrap; }
+.mb-8 { margin-bottom: 8px; }
+.mb-12 { margin-bottom: 12px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
+.log-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.log-item:last-child { border-bottom: none; }
+.log-name { font-size: 13px; font-weight: 500; }
+.log-meta { font-size: 11px; color: var(--text-muted); }
+.remove-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px; padding: 4px 8px; }
+.tab-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(10,10,12,0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: center;
+  padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+  z-index: 100;
+}
+.tab-btn {
+  flex: 1; max-width: 90px; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  background: none; border: none; cursor: pointer; padding: 6px 0;
+  color: var(--text-muted); transition: color 0.2s;
+}
+.tab-btn.active { color: var(--accent); }
+.tab-icon { font-size: 18px; }
+.tab-label { font-size: 10px; font-weight: 400; }
+.tab-btn.active .tab-label { font-weight: 700; }
+.empty { text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 13px; }
+.date-nav { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 14px; }
+.date-nav button { background: none; border: none; color: var(--accent); font-size: 20px; cursor: pointer; padding: 4px 8px; }
+.date-nav span { font-size: 14px; font-weight: 600; min-width: 120px; text-align: center; }
+.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="header">
+    <h1>RECOMP</h1>
+    <p class="mono">TRACK &middot; FUEL &middot; BUILD</p>
+  </div>
+
+  <div id="tab-meals">
+    <div id="date-nav-meals" class="date-nav">
+      <button onclick="changeDate(-1)">&larr;</button>
+      <span id="current-date" class="mono"></span>
+      <button onclick="changeDate(1)">&rarr;</button>
+    </div>
+
+    <div class="card">
+      <div class="card-label mono">Macros</div>
+      <div id="macro-bars"></div>
+    </div>
+
+    <div class="card">
+      <div class="flex gap-8 mb-12">
+        <button class="btn-mode active" id="mode-preset" onclick="setMode('preset')">My Foods</button>
+        <button class="btn-mode inactive" id="mode-custom" onclick="setMode('custom')">Custom</button>
+      </div>
+
+      <div class="flex gap-8 wrap mb-12" id="meal-labels"></div>
+
+      <div id="input-preset">
+        <select id="food-select" class="mb-8"></select>
+        <div class="flex gap-8">
+          <div style="width:70px">
+            <input type="number" id="food-qty" value="1" min="0.5" step="0.5" placeholder="Qty">
+          </div>
+          <button class="btn btn-primary" style="flex:1" onclick="addMeal()">+ Add</button>
+        </div>
+      </div>
+
+      <div id="input-custom" class="hidden">
+        <input id="c-name" placeholder="Food name" class="mb-8">
+        <div class="grid-2 mb-8">
+          <input id="c-cal" type="number" placeholder="Calories">
+          <input id="c-protein" type="number" placeholder="Protein (g)">
+          <input id="c-fat" type="number" placeholder="Fat (g)">
+          <input id="c-carbs" type="number" placeholder="Carbs (g)">
+        </div>
+        <button class="btn btn-primary" onclick="addMeal()">+ Add Custom</button>
+      </div>
+    </div>
+
+    <div class="card" id="meal-log-card" style="display:none">
+      <div class="card-label mono">Today's Log</div>
+      <div id="meal-log"></div>
+    </div>
+  </div>
+
+  <div id="tab-workout" class="hidden">
+    <div class="card">
+      <div class="flex gap-8 wrap mb-12" id="day-types"></div>
+      <input id="w-exercise" placeholder="Exercise name" class="mb-8">
+      <div class="grid-4 mb-8">
+        <input id="w-sets" type="number" placeholder="Sets">
+        <input id="w-reps" type="number" placeholder="Reps">
+        <input id="w-weight" type="number" placeholder="lbs">
+        <input id="w-dur" type="number" placeholder="Min">
+      </div>
+      <button class="btn btn-primary" onclick="addExercise()">+ Log Exercise</button>
+    </div>
+    <div class="card" id="workout-log-card" style="display:none">
+      <div class="card-label mono" id="workout-day-label"></div>
+      <div id="workout-log"></div>
+    </div>
+  </div>
+
+  <div id="tab-weight" class="hidden">
+    <div class="card">
+      <div class="flex gap-8">
+        <input id="bw-input" type="number" placeholder="Today's weight (lbs)" style="flex:1">
+        <button class="btn" style="background:var(--accent);color:#fff;width:auto" onclick="addWeight()">Log</button>
+      </div>
+    </div>
+    <div class="card" id="weight-chart-card" style="display:none">
+      <div class="card-label mono">Trend</div>
+      <svg id="weight-chart" viewBox="0 0 400 120" style="width:100%;height:120px"></svg>
+    </div>
+    <div class="card" id="weight-list-card" style="display:none">
+      <div class="card-label mono">Recent</div>
+      <div id="weight-list"></div>
+    </div>
+  </div>
+
+  <div id="tab-history" class="hidden">
+    <div id="history-list"></div>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" data-tab="meals" onclick="switchTab('meals')">
+    <span class="tab-icon">🍽</span><span class="tab-label mono">Meals</span>
+  </button>
+  <button class="tab-btn" data-tab="workout" onclick="switchTab('workout')">
+    <span class="tab-icon">💪</span><span class="tab-label mono">Workout</span>
+  </button>
+  <button class="tab-btn" data-tab="weight" onclick="switchTab('weight')">
+    <span class="tab-icon">⚖️</span><span class="tab-label mono">Weight</span>
+  </button>
+  <button class="tab-btn" data-tab="history" onclick="switchTab('history')">
+    <span class="tab-icon">📊</span><span class="tab-label mono">History</span>
+  </button>
+</div>
+
+<script>
+// # INDEXEDDB STORAGE
+const DB_NAME = 'recomp-tracker';
+const DB_VERSION = 1;
+const STORES = ['meals', 'workouts', 'weights'];
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      STORES.forEach(s => { if (!db.objectStoreNames.contains(s)) db.createObjectStore(s, { keyPath: 'id' }); });
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function dbGetAll(store) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, 'readonly');
+    const req = tx.objectStore(store).getAll();
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function dbPut(store, item) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, 'readwrite');
+    tx.objectStore(store).put(item);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+async function dbDelete(store, id) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, 'readwrite');
+    tx.objectStore(store).delete(id);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+// # APP STATE
+let meals = [];
+let workouts = [];
+let weights = [];
+let currentTab = 'meals';
+let inputMode = 'preset';
+let mealLabel = 'Breakfast';
+let dayType = 'Push';
+let viewDate = getToday();
+
+function getToday() { return new Date().toISOString().split('T')[0]; }
+
+const TARGETS = { calories: [1700, 1800], protein: [150, 160], fat: [50, 60], carbs: [150, 180] };
+
+const PRESET_FOODS = [
+  { name: "Paneer (100g)", cal: 265, protein: 18, fat: 21, carbs: 3 },
+  { name: "Eggs (1 whole)", cal: 70, protein: 6, fat: 5, carbs: 0.5 },
+  { name: "Cooked Rice (100g)", cal: 130, protein: 2.5, fat: 0.3, carbs: 28 },
+  { name: "Dal (1 cup)", cal: 170, protein: 12, fat: 3, carbs: 25 },
+  { name: "Wheat Bread (1 slice)", cal: 80, protein: 3, fat: 1, carbs: 14 },
+  { name: "UF Shake (milk+whey)", cal: 270, protein: 37, fat: 6.5, carbs: 15 },
+  { name: "Greek Yogurt (180g)", cal: 100, protein: 17, fat: 0.5, carbs: 6 },
+  { name: "Banana (1 medium)", cal: 105, protein: 1, fat: 0, carbs: 27 },
+  { name: "Chicken Breast (100g)", cal: 165, protein: 31, fat: 3.6, carbs: 0 },
+  { name: "Chicken Keema (100g)", cal: 150, protein: 20, fat: 7, carbs: 1 },
+  { name: "Chana Masala (100g)", cal: 120, protein: 5, fat: 4, carbs: 16 },
+  { name: "Whey Shake (water)", cal: 130, protein: 24, fat: 1.5, carbs: 4 },
+  { name: "Peanut Butter (1 tbsp)", cal: 95, protein: 4, fat: 8, carbs: 3 },
+  { name: "UF Milk (240ml)", cal: 100, protein: 13, fat: 2.5, carbs: 9 },
+  { name: "Lindt 85% (2 cubes)", cal: 120, protein: 2, fat: 10, carbs: 5 },
+  { name: "Potstickers (6 pcs)", cal: 280, protein: 12, fat: 10, carbs: 32 },
+];
+
+const MEAL_LABELS = ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Shake'];
+const DAY_TYPES = ['Push', 'Pull', 'Legs', 'Cardio', 'Rest'];
+
+// # INIT
+async function init() {
+  meals = await dbGetAll('meals');
+  workouts = await dbGetAll('workouts');
+  weights = await dbGetAll('weights');
+
+  renderFoodSelect();
+  renderMealLabels();
+  renderDayTypes();
+  renderAll();
+}
+
+// # DATE NAV
+function changeDate(dir) {
+  const d = new Date(viewDate + 'T12:00:00');
+  d.setDate(d.getDate() + dir);
+  const t = new Date();
+  if (d > t) return;
+  viewDate = d.toISOString().split('T')[0];
+  renderAll();
+}
+
+// # TABS
+function switchTab(tab) {
+  currentTab = tab;
+  ['meals','workout','weight','history'].forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('hidden', t !== tab);
+  });
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === tab);
+  });
+  renderAll();
+}
+
+// # MODE
+function setMode(mode) {
+  inputMode = mode;
+  document.getElementById('mode-preset').className = 'btn-mode ' + (mode === 'preset' ? 'active' : 'inactive');
+  document.getElementById('mode-custom').className = 'btn-mode ' + (mode === 'custom' ? 'active' : 'inactive');
+  document.getElementById('input-preset').classList.toggle('hidden', mode !== 'preset');
+  document.getElementById('input-custom').classList.toggle('hidden', mode !== 'custom');
+}
+
+// # RENDERS
+function renderFoodSelect() {
+  const sel = document.getElementById('food-select');
+  sel.innerHTML = PRESET_FOODS.map((f, i) =>
+    `<option value="${i}">${f.name} — ${f.cal}cal / ${f.protein}p / ${f.fat}f / ${f.carbs}c</option>`
+  ).join('');
+}
+
+function renderMealLabels() {
+  document.getElementById('meal-labels').innerHTML = MEAL_LABELS.map(l =>
+    `<button class="btn-toggle ${mealLabel === l ? 'active' : ''}" onclick="setMealLabel('${l}')">${l}</button>`
+  ).join('');
+}
+
+function setMealLabel(l) { mealLabel = l; renderMealLabels(); }
+
+function renderDayTypes() {
+  document.getElementById('day-types').innerHTML = DAY_TYPES.map(d =>
+    `<button class="btn-toggle ${dayType === d ? 'active' : ''}" onclick="setDayType('${d}')">${d}</button>`
+  ).join('');
+}
+
+function setDayType(d) { dayType = d; renderDayTypes(); }
+
+function renderAll() {
+  renderDateNav();
+  renderMacroBars();
+  renderMealLog();
+  renderWorkoutLog();
+  renderWeightTab();
+  renderHistory();
+}
+
+function renderDateNav() {
+  const isToday = viewDate === getToday();
+  const d = new Date(viewDate + 'T12:00:00');
+  const label = isToday ? 'Today' : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', weekday: 'short' });
+  document.getElementById('current-date').textContent = label;
+}
+
+function getDayMeals() { return meals.filter(m => m.date === viewDate); }
+function getDayWorkouts() { return workouts.filter(w => w.date === viewDate); }
+
+function getTotals(dayMeals) {
+  return dayMeals.reduce((a, m) => ({
+    cal: a.cal + m.cal, protein: a.protein + m.protein, fat: a.fat + m.fat, carbs: a.carbs + m.carbs
+  }), { cal: 0, protein: 0, fat: 0, carbs: 0 });
+}
+
+function renderMacroBars() {
+  const t = getTotals(getDayMeals());
+  const bars = [
+    { label: 'Calories', value: t.cal, min: TARGETS.calories[0], max: TARGETS.calories[1], unit: 'kcal' },
+    { label: 'Protein', value: t.protein, min: TARGETS.protein[0], max: TARGETS.protein[1], unit: 'g' },
+    { label: 'Fat', value: t.fat, min: TARGETS.fat[0], max: TARGETS.fat[1], unit: 'g' },
+    { label: 'Carbs', value: t.carbs, min: TARGETS.carbs[0], max: TARGETS.carbs[1], unit: 'g' },
+  ];
+  document.getElementById('macro-bars').innerHTML = bars.map(b => {
+    const pct = Math.min((b.value / b.max) * 100, 100);
+    const over = b.value > b.max;
+    const inRange = b.value >= b.min && b.value <= b.max;
+    const color = over ? 'var(--red)' : inRange ? 'var(--green)' : 'var(--yellow)';
+    return `<div class="bar-wrap">
+      <div class="bar-header mono"><span>${b.label}</span><span style="color:${color}">${Math.round(b.value)}${b.unit} / ${b.min}-${b.max}${b.unit}</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderMealLog() {
+  const dm = getDayMeals();
+  const card = document.getElementById('meal-log-card');
+  const log = document.getElementById('meal-log');
+  if (dm.length === 0) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  log.innerHTML = dm.map(m => `
+    <div class="log-item">
+      <div>
+        <div class="log-name">${m.name}</div>
+        <div class="log-meta mono">${m.label} — ${m.cal}cal / ${m.protein}p / ${m.fat}f / ${m.carbs}c</div>
+      </div>
+      <button class="remove-btn" onclick="removeMeal('${m.id}')">&times;</button>
+    </div>
+  `).join('');
+}
+
+function renderWorkoutLog() {
+  const dw = getDayWorkouts();
+  const card = document.getElementById('workout-log-card');
+  const log = document.getElementById('workout-log');
+  if (dw.length === 0) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  document.getElementById('workout-day-label').textContent = (dw[0]?.dayType || 'Workout') + ' Day';
+  log.innerHTML = dw.map(w => {
+    let meta = '';
+    if (w.sets !== '-') meta += w.sets + '×' + w.reps;
+    if (w.weight !== '-') meta += ' @ ' + w.weight + 'lbs';
+    if (w.duration !== '-') meta += ' ' + w.duration + 'min';
+    return `<div class="log-item">
+      <div><div class="log-name">${w.exercise}</div><div class="log-meta mono">${meta}</div></div>
+      <button class="remove-btn" onclick="removeExercise('${w.id}')">&times;</button>
+    </div>`;
+  }).join('');
+}
+
+function renderWeightTab() {
+  const sorted = [...weights].sort((a, b) => a.date.localeCompare(b.date));
+  const recent = sorted.slice(-14);
+
+  // chart
+  const chartCard = document.getElementById('weight-chart-card');
+  if (recent.length > 1) {
+    chartCard.style.display = 'block';
+    const svg = document.getElementById('weight-chart');
+    const maxW = Math.max(...recent.map(r => r.weight));
+    const minW = Math.min(...recent.map(r => r.weight));
+    const range = maxW - minW || 5;
+    const w = 400;
+    let html = '';
+    recent.forEach((r, i) => {
+      const x = (i / (recent.length - 1)) * (w - 60) + 30;
+      const y = 100 - ((r.weight - minW + 1) / (range + 2)) * 80;
+      if (i < recent.length - 1) {
+        const nx = ((i + 1) / (recent.length - 1)) * (w - 60) + 30;
+        const ny = 100 - ((recent[i + 1].weight - minW + 1) / (range + 2)) * 80;
+        html += `<line x1="${x}" y1="${y}" x2="${nx}" y2="${ny}" stroke="var(--accent)" stroke-width="2" opacity="0.6"/>`;
+      }
+      html += `<circle cx="${x}" cy="${y}" r="4" fill="var(--accent)"/>`;
+      html += `<text x="${x}" y="${y - 10}" text-anchor="middle" font-size="9" fill="var(--text-secondary)" font-family="'JetBrains Mono', monospace">${r.weight}</text>`;
+      html += `<text x="${x}" y="115" text-anchor="middle" font-size="7" fill="var(--text-muted)" font-family="'JetBrains Mono', monospace">${r.date.slice(5)}</text>`;
+    });
+    svg.innerHTML = html;
+  } else {
+    chartCard.style.display = 'none';
+  }
+
+  // list
+  const listCard = document.getElementById('weight-list-card');
+  const list = document.getElementById('weight-list');
+  if (sorted.length > 0) {
+    listCard.style.display = 'block';
+    list.innerHTML = sorted.slice(-7).reverse().map(w =>
+      `<div class="log-item"><span class="mono" style="color:var(--text-secondary)">${w.date}</span><span class="mono" style="font-weight:600">${w.weight} lbs</span></div>`
+    ).join('');
+  } else {
+    listCard.style.display = 'none';
+  }
+}
+
+function renderHistory() {
+  const dates = [...new Set(meals.map(m => m.date))].sort().reverse().slice(0, 21);
+  const el = document.getElementById('history-list');
+  if (dates.length === 0) { el.innerHTML = '<div class="empty mono">No history yet</div>'; return; }
+  el.innerHTML = dates.map(date => {
+    const dm = meals.filter(m => m.date === date);
+    const t = getTotals(dm);
+    const isToday = date === getToday();
+    const calOk = t.cal >= TARGETS.calories[0] && t.cal <= TARGETS.calories[1];
+    return `<div class="card" style="padding:14px;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span class="mono" style="font-size:13px;font-weight:600">${isToday ? 'Today' : date}</span>
+        <span class="mono" style="font-size:12px;color:${calOk ? 'var(--green)' : 'var(--yellow)'}">${Math.round(t.cal)} kcal</span>
+      </div>
+      <div class="mono" style="font-size:11px;color:var(--text-muted)">P: ${Math.round(t.protein)}g · F: ${Math.round(t.fat)}g · C: ${Math.round(t.carbs)}g</div>
+    </div>`;
+  }).join('');
+}
+
+// # ACTIONS
+async function addMeal() {
+  let entry;
+  if (inputMode === 'preset') {
+    const idx = +document.getElementById('food-select').value;
+    const qty = +document.getElementById('food-qty').value || 1;
+    const p = PRESET_FOODS[idx];
+    entry = {
+      id: Date.now().toString(),
+      date: viewDate,
+      label: mealLabel,
+      name: p.name + (qty !== 1 ? ' x' + qty : ''),
+      cal: Math.round(p.cal * qty),
+      protein: Math.round(p.protein * qty * 10) / 10,
+      fat: Math.round(p.fat * qty * 10) / 10,
+      carbs: Math.round(p.carbs * qty * 10) / 10,
+    };
+    document.getElementById('food-qty').value = 1;
+  } else {
+    const name = document.getElementById('c-name').value.trim();
+    const cal = document.getElementById('c-cal').value;
+    if (!name || !cal) return;
+    entry = {
+      id: Date.now().toString(),
+      date: viewDate,
+      label: mealLabel,
+      name,
+      cal: +cal,
+      protein: +(document.getElementById('c-protein').value) || 0,
+      fat: +(document.getElementById('c-fat').value) || 0,
+      carbs: +(document.getElementById('c-carbs').value) || 0,
+    };
+    ['c-name','c-cal','c-protein','c-fat','c-carbs'].forEach(id => document.getElementById(id).value = '');
+  }
+  meals.push(entry);
+  await dbPut('meals', entry);
+  renderAll();
+}
+
+async function removeMeal(id) {
+  meals = meals.filter(m => m.id !== id);
+  await dbDelete('meals', id);
+  renderAll();
+}
+
+async function addExercise() {
+  const exercise = document.getElementById('w-exercise').value.trim();
+  if (!exercise) return;
+  const entry = {
+    id: Date.now().toString(),
+    date: getToday(),
+    dayType,
+    exercise,
+    sets: document.getElementById('w-sets').value || '-',
+    reps: document.getElementById('w-reps').value || '-',
+    weight: document.getElementById('w-weight').value || '-',
+    duration: document.getElementById('w-dur').value || '-',
+  };
+  workouts.push(entry);
+  await dbPut('workouts', entry);
+  ['w-exercise','w-sets','w-reps','w-weight','w-dur'].forEach(id => document.getElementById(id).value = '');
+  renderAll();
+}
+
+async function removeExercise(id) {
+  workouts = workouts.filter(w => w.id !== id);
+  await dbDelete('workouts', id);
+  renderAll();
+}
+
+async function addWeight() {
+  const val = +document.getElementById('bw-input').value;
+  if (!val) return;
+  const today = getToday();
+  weights = weights.filter(w => w.date !== today);
+  const entry = { id: 'w-' + today, date: today, weight: val };
+  weights.push(entry);
+  await dbPut('weights', entry);
+  document.getElementById('bw-input').value = '';
+  renderAll();
+}
+
+// # SERVICE WORKER
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+// # START
+init();
+</script>
+</body>
+</html>
