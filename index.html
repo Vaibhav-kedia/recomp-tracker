@@ -5,72 +5,80 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Recomp">
-<meta name="theme-color" content="#0a0a0c">
+<meta name="apple-mobile-web-app-title" content="FuelLog">
+<meta name="theme-color" content="#09090b">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>Recomp Tracker</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>FuelLog</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0a0a0c;
-  --card: #131318;
-  --border: #1e1e26;
-  --text: #e8e8ec;
-  --text-secondary: #9898a6;
-  --text-muted: #5a5a6e;
-  --accent: #6366f1;
-  --accent-soft: rgba(99,102,241,0.12);
-  --btn-inactive: #1a1a22;
-  --input-bg: #0e0e12;
-  --bar-bg: #1a1a22;
-  --green: #4ecb71;
-  --yellow: #f0c24a;
-  --red: #e85d4a;
+  --bg: #09090b;
+  --card: #111114;
+  --border: #1c1c22;
+  --text: #ededf0;
+  --text-secondary: #a0a0b0;
+  --text-muted: #55556a;
+  --accent: #0ea5e9;
+  --accent-soft: rgba(14,165,233,0.1);
+  --accent-glow: rgba(14,165,233,0.25);
+  --btn-inactive: #18181e;
+  --input-bg: #0d0d10;
+  --bar-bg: #18181e;
+  --green: #34d399;
+  --yellow: #fbbf24;
+  --red: #f87171;
+  --radius: 14px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'Space Grotesk', sans-serif;
-  min-height: 100vh;
+  font-family: 'Outfit', sans-serif;
   min-height: 100dvh;
   padding: env(safe-area-inset-top) 0 0 0;
   overflow-x: hidden;
 }
-.mono { font-family: 'JetBrains Mono', monospace; }
-.app { max-width: 440px; margin: 0 auto; padding: 12px 14px 120px; }
-.header { text-align: center; padding: 16px 0 14px; }
-.header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
-.header p { font-size: 11px; color: var(--text-muted); letter-spacing: 2px; }
-.card { background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 14px; border: 1px solid var(--border); }
-.card-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 10px; }
+.mono { font-family: 'DM Mono', monospace; }
+.app { max-width: 460px; margin: 0 auto; padding: 12px 16px 120px; }
+.header { text-align: center; padding: 18px 0 16px; }
+.header h1 { font-size: 26px; font-weight: 800; letter-spacing: 3px; background: linear-gradient(135deg, var(--accent), #67e8f9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.header p { font-size: 10px; color: var(--text-muted); letter-spacing: 3px; margin-top: 2px; }
+
+/* day type toggle */
+.day-toggle { display: flex; background: var(--card); border-radius: 10px; padding: 3px; margin-bottom: 16px; border: 1px solid var(--border); }
+.day-toggle button { flex: 1; padding: 9px 0; border-radius: 8px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; font-family: 'DM Mono', monospace; transition: all 0.25s; }
+.day-toggle button.active { background: var(--accent); color: #fff; box-shadow: 0 0 12px var(--accent-glow); }
+.day-toggle button.inactive { background: transparent; color: var(--text-muted); }
+
+.card { background: var(--card); border-radius: var(--radius); padding: 16px; margin-bottom: 14px; border: 1px solid var(--border); }
+.card-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 10px; }
 .bar-wrap { margin-bottom: 10px; }
-.bar-header { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 3px; color: var(--text-secondary); }
-.bar-track { height: 6px; background: var(--bar-bg); border-radius: 3px; overflow: hidden; }
-.bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+.bar-header { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; color: var(--text-secondary); }
+.bar-track { height: 7px; background: var(--bar-bg); border-radius: 4px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
 input, select {
-  width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border);
+  width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border);
   background: var(--input-bg); color: var(--text); font-size: 13px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'DM Mono', monospace;
 }
-input:focus, select:focus { outline: 1px solid var(--accent); }
+input:focus, select:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
 input::placeholder { color: var(--text-muted); }
 select { appearance: none; }
 .btn {
-  padding: 10px 16px; border-radius: 8px; border: none; font-size: 13px;
-  font-weight: 600; cursor: pointer; font-family: 'JetBrains Mono', monospace;
-  transition: opacity 0.2s;
+  padding: 10px 16px; border-radius: 10px; border: none; font-size: 13px;
+  font-weight: 600; cursor: pointer; font-family: 'DM Mono', monospace;
+  transition: opacity 0.2s, transform 0.1s;
 }
-.btn:active { opacity: 0.7; }
+.btn:active { opacity: 0.7; transform: scale(0.97); }
 .btn-primary { background: var(--accent); color: #fff; width: 100%; }
 .btn-toggle {
-  padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border);
+  padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border);
   background: transparent; color: var(--text-secondary); font-size: 12px;
-  font-family: 'JetBrains Mono', monospace; cursor: pointer;
+  font-family: 'DM Mono', monospace; cursor: pointer; transition: all 0.2s;
 }
-.btn-toggle.active { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
-.btn-mode { flex: 1; padding: 8px 0; border-radius: 8px; border: none; cursor: pointer; font-size: 12px; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+.btn-toggle.active { background: var(--accent-soft); color: var(--accent); border-color: rgba(14,165,233,0.3); }
+.btn-mode { flex: 1; padding: 8px 0; border-radius: 8px; border: none; cursor: pointer; font-size: 12px; font-weight: 600; font-family: 'DM Mono', monospace; transition: all 0.2s; }
 .btn-mode.active { background: var(--accent); color: #fff; }
 .btn-mode.inactive { background: var(--btn-inactive); color: var(--text-secondary); }
 .flex { display: flex; }
@@ -79,15 +87,15 @@ select { appearance: none; }
 .mb-8 { margin-bottom: 8px; }
 .mb-12 { margin-bottom: 12px; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
-.log-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.log-item { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); }
 .log-item:last-child { border-bottom: none; }
 .log-name { font-size: 13px; font-weight: 500; }
-.log-meta { font-size: 11px; color: var(--text-muted); }
-.remove-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px; padding: 4px 8px; }
+.log-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.icon-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px; padding: 4px 6px; transition: color 0.2s; }
+.icon-btn:hover { color: var(--text-secondary); }
 .tab-bar {
   position: fixed; bottom: 0; left: 0; right: 0;
-  background: rgba(10,10,12,0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  background: rgba(9,9,11,0.92); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
   border-top: 1px solid var(--border);
   display: flex; justify-content: center;
   padding: 8px 0 34px;
@@ -95,27 +103,47 @@ select { appearance: none; }
   z-index: 100;
 }
 .tab-btn {
-  flex: 1; max-width: 90px; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  flex: 1; max-width: 100px; display: flex; flex-direction: column; align-items: center; gap: 3px;
   background: none; border: none; cursor: pointer; padding: 6px 0;
   color: var(--text-muted); transition: color 0.2s;
 }
 .tab-btn.active { color: var(--accent); }
 .tab-icon { font-size: 18px; }
-.tab-label { font-size: 10px; font-weight: 400; }
+.tab-label { font-size: 10px; font-weight: 400; letter-spacing: 0.5px; }
 .tab-btn.active .tab-label { font-weight: 700; }
 .empty { text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 13px; }
 .date-nav { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 14px; }
 .date-nav button { background: none; border: none; color: var(--accent); font-size: 20px; cursor: pointer; padding: 4px 8px; }
 .date-nav span { font-size: 14px; font-weight: 600; min-width: 120px; text-align: center; }
 .hidden { display: none; }
+
+/* edit modal */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.modal {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 20px; width: 100%; max-width: 380px;
+}
+.modal h3 { font-size: 15px; margin-bottom: 14px; font-weight: 600; }
+.modal .btn-row { display: flex; gap: 8px; margin-top: 14px; }
+.modal .btn-row .btn { flex: 1; }
+.btn-secondary { background: var(--btn-inactive); color: var(--text-secondary); }
+.btn-danger { background: rgba(248,113,113,0.15); color: var(--red); }
+
+/* food manager */
+.food-manage-btn { font-size: 11px; color: var(--accent); background: none; border: none; cursor: pointer; font-family: 'DM Mono', monospace; padding: 2px 0; }
+.food-list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+.food-list-item:last-child { border-bottom: none; }
 </style>
 </head>
 <body>
 
 <div class="app">
   <div class="header">
-    <h1>RECOMP</h1>
-    <p class="mono">TRACK &middot; FUEL &middot; BUILD</p>
+    <h1>FUELLOG</h1>
+    <p class="mono">TRACK &middot; EAT &middot; BUILD</p>
   </div>
 
   <div id="tab-meals">
@@ -123,6 +151,11 @@ select { appearance: none; }
       <button onclick="changeDate(-1)">&larr;</button>
       <span id="current-date" class="mono"></span>
       <button onclick="changeDate(1)">&rarr;</button>
+    </div>
+
+    <div class="day-toggle">
+      <button id="dt-training" class="active" onclick="setDayType('training')">Training Day</button>
+      <button id="dt-rest" class="inactive" onclick="setDayType('rest')">Rest Day</button>
     </div>
 
     <div class="card">
@@ -139,6 +172,10 @@ select { appearance: none; }
       <div class="flex gap-8 wrap mb-12" id="meal-labels"></div>
 
       <div id="input-preset">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span></span>
+          <button class="food-manage-btn" onclick="openFoodManager()">Edit Foods</button>
+        </div>
         <select id="food-select" class="mb-8"></select>
         <div class="flex gap-8">
           <div style="width:70px">
@@ -166,40 +203,10 @@ select { appearance: none; }
     </div>
   </div>
 
-  <div id="tab-workout" class="hidden">
-    <div class="card">
-      <div class="flex gap-8 wrap mb-12" id="day-types"></div>
-
-      <div class="flex gap-8 mb-8">
-        <button class="btn-mode active" id="exmode-preset" onclick="setExMode('preset')">PPL Exercises</button>
-        <button class="btn-mode inactive" id="exmode-custom" onclick="setExMode('custom')">Custom</button>
-      </div>
-
-      <div id="ex-input-preset">
-        <select id="exercise-select" class="mb-8"></select>
-      </div>
-      <div id="ex-input-custom" class="hidden">
-        <input id="w-exercise-custom" placeholder="Exercise name" class="mb-8">
-      </div>
-
-      <div class="grid-4 mb-8">
-        <input id="w-sets" type="number" placeholder="Sets">
-        <input id="w-reps" type="number" placeholder="Reps">
-        <input id="w-weight" type="number" placeholder="kg">
-        <input id="w-dur" type="number" placeholder="Min">
-      </div>
-      <button class="btn btn-primary" onclick="addExercise()">+ Log Exercise</button>
-    </div>
-    <div class="card" id="workout-log-card" style="display:none">
-      <div class="card-label mono" id="workout-day-label"></div>
-      <div id="workout-log"></div>
-    </div>
-  </div>
-
   <div id="tab-weight" class="hidden">
     <div class="card">
       <div class="flex gap-8">
-        <input id="bw-input" type="number" placeholder="Today's weight (kg)" style="flex:1">
+        <input id="bw-input" type="number" placeholder="Today's weight (kg)" step="0.1" style="flex:1">
         <button class="btn" style="background:var(--accent);color:#fff;width:auto" onclick="addWeight()">Log</button>
       </div>
     </div>
@@ -218,12 +225,12 @@ select { appearance: none; }
   </div>
 </div>
 
+<!-- modal container -->
+<div id="modal-root"></div>
+
 <div class="tab-bar">
   <button class="tab-btn active" data-tab="meals" onclick="switchTab('meals')">
     <span class="tab-icon">🍽</span><span class="tab-label mono">Meals</span>
-  </button>
-  <button class="tab-btn" data-tab="workout" onclick="switchTab('workout')">
-    <span class="tab-icon">💪</span><span class="tab-label mono">Workout</span>
   </button>
   <button class="tab-btn" data-tab="weight" onclick="switchTab('weight')">
     <span class="tab-icon">⚖️</span><span class="tab-label mono">Weight</span>
@@ -234,10 +241,10 @@ select { appearance: none; }
 </div>
 
 <script>
-// # INDEXEDDB STORAGE
+// # INDEXEDDB
 const DB_NAME = 'recomp-tracker';
-const DB_VERSION = 1;
-const STORES = ['meals', 'workouts', 'weights'];
+const DB_VERSION = 2;
+const STORES = ['meals', 'weights', 'settings', 'customFoods'];
 
 function openDB() {
   return new Promise((resolve, reject) => {
@@ -281,30 +288,33 @@ async function dbDelete(store, id) {
   });
 }
 
-// # LOCAL DATE (timezone safe)
+// # DATE UTILS
 function getToday() {
   const d = new Date();
-  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
-
 function localDateStr(date) {
-  return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+  return date.getFullYear() + '-' + String(date.getMonth()+1).padStart(2,'0') + '-' + String(date.getDate()).padStart(2,'0');
 }
 
-// # APP STATE
+// # STATE
 let meals = [];
-let workouts = [];
 let weights = [];
+let customFoods = [];
 let currentTab = 'meals';
 let inputMode = 'preset';
-let exMode = 'preset';
 let mealLabel = 'Breakfast';
-let dayType = 'Push';
 let viewDate = getToday();
+let dayType = 'training';
 
-const TARGETS = { calories: [1700, 1800], protein: [150, 160], fat: [50, 60], carbs: [150, 180] };
+// # TARGETS
+const TARGETS = {
+  training: { calories: [2300, 2400], protein: [175, 185], fat: [60, 70], carbs: [200, 220] },
+  rest:     { calories: [2000, 2100], protein: [165, 175], fat: [55, 65], carbs: [160, 180] },
+};
 
-const PRESET_FOODS = [
+// # DEFAULT PRESET FOODS
+const DEFAULT_FOODS = [
   { name: "Paneer (100g)", cal: 265, protein: 18, fat: 21, carbs: 3 },
   { name: "Eggs (1 whole)", cal: 70, protein: 6, fat: 5, carbs: 0.5 },
   { name: "Cooked Rice (100g)", cal: 130, protein: 2.5, fat: 0.3, carbs: 28 },
@@ -323,116 +333,78 @@ const PRESET_FOODS = [
   { name: "Potstickers (6 pcs)", cal: 280, protein: 12, fat: 10, carbs: 32 },
 ];
 
-// # PPL EXERCISE PRESETS (from your split)
-const EXERCISES = {
-  Push: {
-    Compounds: [
-      "Incline Barbell Press",
-      "Flat Dumbbell Press",
-      "Overhead Press",
-    ],
-    Isolation: [
-      "Cable Flyes (low to high)",
-      "Lateral Raise",
-      "Cable Lateral Raise",
-      "Tricep Rope Pushdown",
-      "Overhead Tricep Extension",
-      "Dips (BW or assisted)",
-    ],
-    Finisher: [
-      "Hanging Knee Raises",
-      "Cable Crunches",
-      "Treadmill",
-    ],
-  },
-  Pull: {
-    Compounds: [
-      "Barbell Row",
-      "Lat Pulldown (wide grip)",
-      "Seated Cable Row (close grip)",
-    ],
-    Isolation: [
-      "Face Pulls",
-      "Straight Arm Pulldown",
-      "Barbell Curl",
-      "Hammer Curl",
-      "Incline Dumbbell Curl",
-      "Wrist Curls",
-    ],
-    Finisher: [
-      "Plank Hold",
-      "Russian Twists",
-      "Treadmill",
-    ],
-  },
-  Legs: {
-    Compounds: [
-      "Squat (or Leg Press)",
-      "Romanian Deadlift",
-      "Walking Lunges",
-    ],
-    Isolation: [
-      "Leg Curl",
-      "Leg Extension",
-      "Calf Raise",
-      "Hip Abductor Machine",
-    ],
-    Finisher: [
-      "Hanging Leg Raises",
-      "Ab Wheel or Cable Crunch",
-      "Treadmill",
-    ],
-  },
-  Cardio: {
-    Cardio: [
-      "Treadmill",
-      "Incline Walk",
-      "Cycling",
-      "Elliptical",
-      "Stair Climber",
-      "Jump Rope",
-    ],
-  },
-  Rest: {
-    Recovery: [
-      "Stretching",
-      "Foam Rolling",
-      "Light Walk",
-    ],
-  },
-};
+function getPresetFoods() {
+  if (customFoods.length > 0) return customFoods;
+  return DEFAULT_FOODS.map((f, i) => ({ ...f, id: 'default-' + i }));
+}
 
 const MEAL_LABELS = ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Shake'];
-const DAY_TYPES = ['Push', 'Pull', 'Legs', 'Cardio', 'Rest'];
 
 // # INIT
 async function init() {
   meals = await dbGetAll('meals');
-  workouts = await dbGetAll('workouts');
   weights = await dbGetAll('weights');
+  customFoods = await dbGetAll('customFoods');
+
+  // seed defaults if empty
+  if (customFoods.length === 0) {
+    for (let i = 0; i < DEFAULT_FOODS.length; i++) {
+      const f = { ...DEFAULT_FOODS[i], id: 'food-' + i };
+      customFoods.push(f);
+      await dbPut('customFoods', f);
+    }
+  }
+
+  // load day type for today
+  try {
+    const settings = await dbGetAll('settings');
+    const todaySetting = settings.find(s => s.id === 'dayType-' + viewDate);
+    if (todaySetting) dayType = todaySetting.value;
+  } catch(e) {}
 
   renderFoodSelect();
   renderMealLabels();
-  renderDayTypes();
-  renderExerciseSelect();
+  updateDayToggle();
   renderAll();
 }
 
-// # DATE NAV (timezone safe, string comparison)
-function changeDate(dir) {
+// # DAY TYPE TOGGLE
+function setDayType(type) {
+  dayType = type;
+  updateDayToggle();
+  dbPut('settings', { id: 'dayType-' + viewDate, value: type });
+  renderAll();
+}
+
+function updateDayToggle() {
+  document.getElementById('dt-training').className = dayType === 'training' ? 'active' : 'inactive';
+  document.getElementById('dt-rest').className = dayType === 'rest' ? 'active' : 'inactive';
+}
+
+// # DATE NAV
+async function changeDate(dir) {
   const parts = viewDate.split('-');
-  const d = new Date(+parts[0], +parts[1] - 1, +parts[2]);
+  const d = new Date(+parts[0], +parts[1]-1, +parts[2]);
   d.setDate(d.getDate() + dir);
-  const newDateStr = localDateStr(d);
-  if (newDateStr > getToday()) return;
-  viewDate = newDateStr;
+  const newDate = localDateStr(d);
+  if (newDate > getToday()) return;
+  viewDate = newDate;
+
+  // load saved day type
+  try {
+    const settings = await dbGetAll('settings');
+    const s = settings.find(s => s.id === 'dayType-' + viewDate);
+    dayType = s ? s.value : 'training';
+  } catch(e) { dayType = 'training'; }
+
+  updateDayToggle();
   renderAll();
 }
 
 // # TABS
 function switchTab(tab) {
   currentTab = tab;
-  ['meals','workout','weight','history'].forEach(t => {
+  ['meals','weight','history'].forEach(t => {
     document.getElementById('tab-' + t).classList.toggle('hidden', t !== tab);
   });
   document.querySelectorAll('.tab-btn').forEach(b => {
@@ -441,7 +413,7 @@ function switchTab(tab) {
   renderAll();
 }
 
-// # MODE TOGGLES
+// # MODE
 function setMode(mode) {
   inputMode = mode;
   document.getElementById('mode-preset').className = 'btn-mode ' + (mode === 'preset' ? 'active' : 'inactive');
@@ -450,34 +422,13 @@ function setMode(mode) {
   document.getElementById('input-custom').classList.toggle('hidden', mode !== 'custom');
 }
 
-function setExMode(mode) {
-  exMode = mode;
-  document.getElementById('exmode-preset').className = 'btn-mode ' + (mode === 'preset' ? 'active' : 'inactive');
-  document.getElementById('exmode-custom').className = 'btn-mode ' + (mode === 'custom' ? 'active' : 'inactive');
-  document.getElementById('ex-input-preset').classList.toggle('hidden', mode !== 'preset');
-  document.getElementById('ex-input-custom').classList.toggle('hidden', mode !== 'custom');
-}
-
 // # RENDERS
 function renderFoodSelect() {
   const sel = document.getElementById('food-select');
-  sel.innerHTML = PRESET_FOODS.map((f, i) =>
-    `<option value="${i}">${f.name} — ${f.cal}cal / ${f.protein}p / ${f.fat}f / ${f.carbs}c</option>`
+  const foods = getPresetFoods();
+  sel.innerHTML = foods.map((f, i) =>
+    `<option value="${i}">${f.name} — ${f.cal}cal/${f.protein}p/${f.fat}f/${f.carbs}c</option>`
   ).join('');
-}
-
-function renderExerciseSelect() {
-  const sel = document.getElementById('exercise-select');
-  const dayExercises = EXERCISES[dayType] || {};
-  let html = '';
-  for (const [section, exList] of Object.entries(dayExercises)) {
-    html += `<optgroup label="${section}">`;
-    exList.forEach(ex => {
-      html += `<option value="${ex}">${ex}</option>`;
-    });
-    html += `</optgroup>`;
-  }
-  sel.innerHTML = html;
 }
 
 function renderMealLabels() {
@@ -488,23 +439,10 @@ function renderMealLabels() {
 
 function setMealLabel(l) { mealLabel = l; renderMealLabels(); }
 
-function renderDayTypes() {
-  document.getElementById('day-types').innerHTML = DAY_TYPES.map(d =>
-    `<button class="btn-toggle ${dayType === d ? 'active' : ''}" onclick="setDayType('${d}')">${d}</button>`
-  ).join('');
-}
-
-function setDayType(d) {
-  dayType = d;
-  renderDayTypes();
-  renderExerciseSelect();
-}
-
 function renderAll() {
   renderDateNav();
   renderMacroBars();
   renderMealLog();
-  renderWorkoutLog();
   renderWeightTab();
   renderHistory();
 }
@@ -512,13 +450,12 @@ function renderAll() {
 function renderDateNav() {
   const isToday = viewDate === getToday();
   const parts = viewDate.split('-');
-  const d = new Date(+parts[0], +parts[1] - 1, +parts[2]);
+  const d = new Date(+parts[0], +parts[1]-1, +parts[2]);
   const label = isToday ? 'Today' : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', weekday: 'short' });
   document.getElementById('current-date').textContent = label;
 }
 
 function getDayMeals() { return meals.filter(m => m.date === viewDate); }
-function getDayWorkouts() { return workouts.filter(w => w.date === viewDate); }
 
 function getTotals(dayMeals) {
   return dayMeals.reduce((a, m) => ({
@@ -528,11 +465,12 @@ function getTotals(dayMeals) {
 
 function renderMacroBars() {
   const t = getTotals(getDayMeals());
+  const tgt = TARGETS[dayType];
   const bars = [
-    { label: 'Calories', value: t.cal, min: TARGETS.calories[0], max: TARGETS.calories[1], unit: 'kcal' },
-    { label: 'Protein', value: t.protein, min: TARGETS.protein[0], max: TARGETS.protein[1], unit: 'g' },
-    { label: 'Fat', value: t.fat, min: TARGETS.fat[0], max: TARGETS.fat[1], unit: 'g' },
-    { label: 'Carbs', value: t.carbs, min: TARGETS.carbs[0], max: TARGETS.carbs[1], unit: 'g' },
+    { label: 'Calories', value: t.cal, min: tgt.calories[0], max: tgt.calories[1], unit: 'kcal' },
+    { label: 'Protein', value: t.protein, min: tgt.protein[0], max: tgt.protein[1], unit: 'g' },
+    { label: 'Fat', value: t.fat, min: tgt.fat[0], max: tgt.fat[1], unit: 'g' },
+    { label: 'Carbs', value: t.carbs, min: tgt.carbs[0], max: tgt.carbs[1], unit: 'g' },
   ];
   document.getElementById('macro-bars').innerHTML = bars.map(b => {
     const pct = Math.min((b.value / b.max) * 100, 100);
@@ -558,28 +496,9 @@ function renderMealLog() {
         <div class="log-name">${m.name}</div>
         <div class="log-meta mono">${m.label} — ${m.cal}cal / ${m.protein}p / ${m.fat}f / ${m.carbs}c</div>
       </div>
-      <button class="remove-btn" onclick="removeMeal('${m.id}')">&times;</button>
+      <button class="icon-btn" onclick="removeMeal('${m.id}')">&times;</button>
     </div>
   `).join('');
-}
-
-function renderWorkoutLog() {
-  const dw = getDayWorkouts();
-  const card = document.getElementById('workout-log-card');
-  const log = document.getElementById('workout-log');
-  if (dw.length === 0) { card.style.display = 'none'; return; }
-  card.style.display = 'block';
-  document.getElementById('workout-day-label').textContent = (dw[0]?.dayType || 'Workout') + ' Day';
-  log.innerHTML = dw.map(w => {
-    let meta = '';
-    if (w.sets !== '-') meta += w.sets + '×' + w.reps;
-    if (w.weight !== '-') meta += ' @ ' + w.weight + 'kg';
-    if (w.duration !== '-') meta += ' ' + w.duration + 'min';
-    return `<div class="log-item">
-      <div><div class="log-name">${w.exercise}</div><div class="log-meta mono">${meta}</div></div>
-      <button class="remove-btn" onclick="removeExercise('${w.id}')">&times;</button>
-    </div>`;
-  }).join('');
 }
 
 function renderWeightTab() {
@@ -599,13 +518,13 @@ function renderWeightTab() {
       const x = (i / (recent.length - 1)) * (w - 60) + 30;
       const y = 100 - ((r.weight - minW + 1) / (range + 2)) * 80;
       if (i < recent.length - 1) {
-        const nx = ((i + 1) / (recent.length - 1)) * (w - 60) + 30;
-        const ny = 100 - ((recent[i + 1].weight - minW + 1) / (range + 2)) * 80;
+        const nx = ((i+1) / (recent.length - 1)) * (w - 60) + 30;
+        const ny = 100 - ((recent[i+1].weight - minW + 1) / (range + 2)) * 80;
         html += `<line x1="${x}" y1="${y}" x2="${nx}" y2="${ny}" stroke="var(--accent)" stroke-width="2" opacity="0.6"/>`;
       }
       html += `<circle cx="${x}" cy="${y}" r="4" fill="var(--accent)"/>`;
-      html += `<text x="${x}" y="${y - 10}" text-anchor="middle" font-size="9" fill="var(--text-secondary)" font-family="'JetBrains Mono', monospace">${r.weight}</text>`;
-      html += `<text x="${x}" y="115" text-anchor="middle" font-size="7" fill="var(--text-muted)" font-family="'JetBrains Mono', monospace">${r.date.slice(5)}</text>`;
+      html += `<text x="${x}" y="${y-10}" text-anchor="middle" font-size="9" fill="var(--text-secondary)" font-family="'DM Mono',monospace">${r.weight}</text>`;
+      html += `<text x="${x}" y="115" text-anchor="middle" font-size="7" fill="var(--text-muted)" font-family="'DM Mono',monospace">${r.date.slice(5)}</text>`;
     });
     svg.innerHTML = html;
   } else {
@@ -632,7 +551,8 @@ function renderHistory() {
     const dm = meals.filter(m => m.date === date);
     const t = getTotals(dm);
     const isToday = date === getToday();
-    const calOk = t.cal >= TARGETS.calories[0] && t.cal <= TARGETS.calories[1];
+    // use training targets as baseline for history color
+    const calOk = t.cal >= 2000 && t.cal <= 2400;
     return `<div class="card" style="padding:14px;margin-bottom:10px">
       <div style="display:flex;justify-content:space-between;margin-bottom:4px">
         <span class="mono" style="font-size:13px;font-weight:600">${isToday ? 'Today' : date}</span>
@@ -649,7 +569,8 @@ async function addMeal() {
   if (inputMode === 'preset') {
     const idx = +document.getElementById('food-select').value;
     const qty = +document.getElementById('food-qty').value || 1;
-    const p = PRESET_FOODS[idx];
+    const foods = getPresetFoods();
+    const p = foods[idx];
     entry = {
       id: Date.now().toString(),
       date: viewDate,
@@ -688,38 +609,6 @@ async function removeMeal(id) {
   renderAll();
 }
 
-async function addExercise() {
-  let exerciseName;
-  if (exMode === 'preset') {
-    exerciseName = document.getElementById('exercise-select').value;
-  } else {
-    exerciseName = document.getElementById('w-exercise-custom').value.trim();
-  }
-  if (!exerciseName) return;
-
-  const entry = {
-    id: Date.now().toString(),
-    date: getToday(),
-    dayType,
-    exercise: exerciseName,
-    sets: document.getElementById('w-sets').value || '-',
-    reps: document.getElementById('w-reps').value || '-',
-    weight: document.getElementById('w-weight').value || '-',
-    duration: document.getElementById('w-dur').value || '-',
-  };
-  workouts.push(entry);
-  await dbPut('workouts', entry);
-  if (exMode === 'custom') document.getElementById('w-exercise-custom').value = '';
-  ['w-sets','w-reps','w-weight','w-dur'].forEach(id => document.getElementById(id).value = '');
-  renderAll();
-}
-
-async function removeExercise(id) {
-  workouts = workouts.filter(w => w.id !== id);
-  await dbDelete('workouts', id);
-  renderAll();
-}
-
 async function addWeight() {
   const val = +document.getElementById('bw-input').value;
   if (!val) return;
@@ -732,12 +621,134 @@ async function addWeight() {
   renderAll();
 }
 
+// # FOOD MANAGER (edit presets)
+function openFoodManager() {
+  const root = document.getElementById('modal-root');
+  const foods = getPresetFoods();
+  root.innerHTML = `
+    <div class="modal-overlay" onclick="if(event.target===this)closeFoodManager()">
+      <div class="modal" style="max-height:80vh;overflow-y:auto">
+        <h3>Edit My Foods</h3>
+        <div id="food-manager-list">
+          ${foods.map((f, i) => `
+            <div class="food-list-item">
+              <div>
+                <div style="font-weight:500">${f.name}</div>
+                <div class="mono" style="font-size:10px;color:var(--text-muted)">${f.cal}cal / ${f.protein}p / ${f.fat}f / ${f.carbs}c</div>
+              </div>
+              <div class="flex gap-8">
+                <button class="icon-btn" onclick="editFood(${i})" title="Edit">✎</button>
+                <button class="icon-btn" onclick="deleteFood(${i})" title="Delete" style="color:var(--red)">&times;</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="btn-row" style="margin-top:14px">
+          <button class="btn btn-primary" onclick="openAddFood()">+ Add New</button>
+          <button class="btn btn-secondary" onclick="closeFoodManager()">Close</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function closeFoodManager() {
+  document.getElementById('modal-root').innerHTML = '';
+  renderFoodSelect();
+}
+
+function openAddFood() {
+  document.getElementById('modal-root').innerHTML = `
+    <div class="modal-overlay" onclick="if(event.target===this)closeFoodManager()">
+      <div class="modal">
+        <h3>Add Food</h3>
+        <input id="ef-name" placeholder="Food name" class="mb-8">
+        <div class="grid-2 mb-8">
+          <input id="ef-cal" type="number" placeholder="Calories">
+          <input id="ef-protein" type="number" placeholder="Protein (g)">
+          <input id="ef-fat" type="number" placeholder="Fat (g)">
+          <input id="ef-carbs" type="number" placeholder="Carbs (g)">
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="saveNewFood()">Save</button>
+          <button class="btn btn-secondary" onclick="openFoodManager()">Back</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+async function saveNewFood() {
+  const name = document.getElementById('ef-name').value.trim();
+  const cal = +document.getElementById('ef-cal').value;
+  if (!name || !cal) return;
+  const food = {
+    id: 'food-' + Date.now(),
+    name,
+    cal,
+    protein: +document.getElementById('ef-protein').value || 0,
+    fat: +document.getElementById('ef-fat').value || 0,
+    carbs: +document.getElementById('ef-carbs').value || 0,
+  };
+  customFoods.push(food);
+  await dbPut('customFoods', food);
+  openFoodManager();
+}
+
+function editFood(idx) {
+  const foods = getPresetFoods();
+  const f = foods[idx];
+  document.getElementById('modal-root').innerHTML = `
+    <div class="modal-overlay" onclick="if(event.target===this)closeFoodManager()">
+      <div class="modal">
+        <h3>Edit Food</h3>
+        <input id="ef-name" value="${f.name}" class="mb-8">
+        <div class="grid-2 mb-8">
+          <input id="ef-cal" type="number" value="${f.cal}" placeholder="Calories">
+          <input id="ef-protein" type="number" value="${f.protein}" placeholder="Protein (g)">
+          <input id="ef-fat" type="number" value="${f.fat}" placeholder="Fat (g)">
+          <input id="ef-carbs" type="number" value="${f.carbs}" placeholder="Carbs (g)">
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="saveEditFood('${f.id}')">Save</button>
+          <button class="btn btn-secondary" onclick="openFoodManager()">Back</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+async function saveEditFood(id) {
+  const name = document.getElementById('ef-name').value.trim();
+  const cal = +document.getElementById('ef-cal').value;
+  if (!name || !cal) return;
+  const updated = {
+    id,
+    name,
+    cal,
+    protein: +document.getElementById('ef-protein').value || 0,
+    fat: +document.getElementById('ef-fat').value || 0,
+    carbs: +document.getElementById('ef-carbs').value || 0,
+  };
+  const idx = customFoods.findIndex(f => f.id === id);
+  if (idx >= 0) customFoods[idx] = updated;
+  await dbPut('customFoods', updated);
+  openFoodManager();
+}
+
+async function deleteFood(idx) {
+  const foods = getPresetFoods();
+  const f = foods[idx];
+  customFoods = customFoods.filter(cf => cf.id !== f.id);
+  await dbDelete('customFoods', f.id);
+  openFoodManager();
+}
+
 // # SERVICE WORKER
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
 
-// # START
 init();
 </script>
 </body>
